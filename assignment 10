@@ -1,0 +1,39 @@
+from surprise import SVD
+from surprise import Dataset
+from surprise.model_selection import cross_validate
+
+data = Dataset.load_builtin('ml-100k')
+algo = SVD()
+
+print(cross_validate(algo, data, measures=['RMSE', 'MAE'], cv=10, verbose=True))
+
+
+import pandas as pd
+import numpy as np
+from sklearn import tree
+from sklearn.externals import joblib
+from sklearn.model_selection import cross_val_score
+from sklearn.svm import SVR
+
+def load_data():
+    df = pd.read_csv('/Users/zhangxiaoyu/Documents/BIA_660/ml-latest/ratings.csv')
+    x = df.drop(['rating'], axis=1).values
+    y = df['rating'].values
+
+    return df, x, y
+
+
+def svr(x, y):
+    depth = []
+    for i in range(3, 20):
+        clf = SVR(gamma='scale', C=1.0, epsilon=0.2)
+        scores = cross_val_score(estimator=clf, X=x, y=y, cv=10, n_jobs=4)
+        depth.append((i, scores.mean()))
+    print(depth)
+    
+    df, x, y = load_data()
+print(np.isnan(x))
+print(np.where(np.isnan(x)))
+new_x = np.nan_to_num(x)
+print()
+svr(new_x, y)
